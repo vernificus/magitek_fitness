@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, // Required for static export if using next/image
   },
+  basePath: process.env.NODE_ENV === "production" ? "/magitek_fitness" : "",
 };
 
 export default nextConfig;
