@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useGame } from "@/context/GameContext";
+import { Skull, ShieldAlert, Sword, Wand2, FlaskConical, Flag, Sparkles } from "lucide-react";
 
 type Enemy = {
   name: string;
@@ -148,106 +149,155 @@ export default function DungeonPage() {
 
   if (!inBattle) {
     return (
-      <div className="max-w-2xl mx-auto text-center flex flex-col gap-6 items-center pt-10">
-        <h2 className="text-3xl text-red-400">The Dungeon</h2>
-        <p className="text-sm">
-          Monsters lurk in the shadows. Make sure you have trained and eaten well before entering.
-        </p>
+      <div className="max-w-2xl mx-auto text-center flex flex-col gap-8 items-center pt-16">
+        <div className="w-24 h-24 bg-rose-500/10 rounded-full flex items-center justify-center mb-4 border border-rose-500/20 shadow-lg shadow-rose-500/10">
+          <Skull className="w-12 h-12 text-rose-500" />
+        </div>
+        <div>
+          <h2 className="text-4xl font-extrabold text-white mb-4 tracking-tight">The Dungeon</h2>
+          <p className="text-lg text-slate-400 max-w-lg mx-auto">
+            Monsters lurk in the shadows. Make sure you have trained and eaten well before entering.
+          </p>
+        </div>
+
         {gameState.stats.hp <= 0 && (
-          <p className="text-red-500 text-xs">You are too weak. Do some Cardio to recover HP!</p>
+          <div className="flex items-center gap-2 bg-red-900/30 text-red-400 px-4 py-3 rounded-lg border border-red-800/50">
+            <ShieldAlert className="w-5 h-5" />
+            <p className="text-sm font-medium">You are too weak. Do some Cardio to recover HP!</p>
+          </div>
         )}
+
         <button
           onClick={startBattle}
           disabled={gameState.stats.hp <= 0}
-          className="retro-button text-xl px-8 py-4 mt-8"
+          className="bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 text-white font-bold text-xl px-12 py-5 rounded-xl shadow-xl shadow-rose-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-3 mt-4"
         >
-          Enter Combat
+          <Sword className="w-6 h-6" /> Enter Combat
         </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-4">
+    <div className="max-w-4xl mx-auto flex flex-col gap-6">
       {/* Battle Arena */}
-      <div className="retro-panel min-h-[300px] flex flex-col justify-between border-gray-400 relative overflow-hidden bg-black/80">
+      <div className="panel min-h-[400px] flex flex-col justify-between border-slate-700 relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-950">
+
+        {/* Background decorative elements */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
         {/* Enemy Status */}
         {enemy && (
-          <div className="self-end p-4 text-right">
-            <h3 className="text-red-400 text-xl mb-2">{enemy.name}</h3>
-            <div className="text-xs mb-1">HP</div>
-            <div className="w-48 h-4 bg-gray-800 border-2 border-white ml-auto">
+          <div className="self-end p-6 text-right w-full sm:w-80 relative z-10 animate-fade-in">
+            <div className="flex items-center justify-end gap-3 mb-3">
+              <h3 className="text-rose-400 text-2xl font-bold tracking-tight">{enemy.name}</h3>
+              <div className="bg-slate-800 p-2 rounded-lg border border-slate-700">
+                <Skull className="w-6 h-6 text-rose-500" />
+              </div>
+            </div>
+            <div className="flex justify-between text-sm font-medium text-slate-400 mb-1">
+              <span>HP</span>
+              <span>{Math.max(0, enemy.hp)} / {enemy.maxHp}</span>
+            </div>
+            <div className="stat-bar-bg h-3 bg-slate-950 border border-slate-800">
               <div
-                className="h-full bg-red-500 transition-all"
+                className="h-full bg-gradient-to-r from-rose-600 to-red-400 transition-all duration-300"
                 style={{ width: `${Math.max(0, (enemy.hp / enemy.maxHp) * 100)}%` }}
               />
             </div>
           </div>
         )}
 
+        {/* Action text overlay (optional visual flair) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none opacity-50 mix-blend-overlay">
+          <Sword className="w-48 h-48 text-slate-500" />
+        </div>
+
         {/* Player Status Summary */}
-        <div className="self-start p-4">
-          <h3 className="text-blue-300 text-lg mb-2">HERO</h3>
-          <div className="flex gap-4 text-xs">
+        <div className="self-start p-6 w-full sm:w-96 relative z-10">
+          <h3 className="text-indigo-300 text-xl font-bold mb-4 tracking-tight flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-indigo-400" /> HERO
+          </h3>
+          <div className="flex flex-col gap-3">
             <div>
-              HP: {gameState.stats.hp}/{gameState.stats.maxHp}
+              <div className="flex justify-between text-sm font-medium text-slate-300 mb-1">
+                <span>HP</span>
+                <span>{gameState.stats.hp} / {gameState.stats.maxHp}</span>
+              </div>
+              <div className="stat-bar-bg h-2.5 bg-slate-950 border border-slate-800">
+                <div className="h-full bg-rose-500 transition-all duration-300" style={{ width: `${(gameState.stats.hp / gameState.stats.maxHp) * 100}%` }} />
+              </div>
             </div>
             <div>
-              MP: {gameState.stats.mp}/{gameState.stats.maxMp}
+              <div className="flex justify-between text-sm font-medium text-slate-300 mb-1">
+                <span>MP</span>
+                <span>{gameState.stats.mp} / {gameState.stats.maxMp}</span>
+              </div>
+              <div className="stat-bar-bg h-2.5 bg-slate-950 border border-slate-800">
+                <div className="h-full bg-cyan-500 transition-all duration-300" style={{ width: `${(gameState.stats.mp / gameState.stats.maxMp) * 100}%` }} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Battle Menus */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-48">
-        {/* Combat Log */}
-        <div className="retro-panel overflow-y-auto flex flex-col justify-end text-xs leading-loose">
-          {combatLog.map((line, i) => (
-            <p key={i} className="animate-fade-in">{line}</p>
-          ))}
-        </div>
-
-        {/* Action Menu */}
-        <div className="retro-panel flex">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 min-h-[200px]">
+        {/* Action Menu (takes 3 cols) */}
+        <div className="panel md:col-span-3 flex flex-col justify-center bg-slate-900 border-slate-700">
           {battleOver ? (
-            <div className="flex-1 flex items-center justify-center">
-              <button onClick={() => setInBattle(false)} className="retro-button">
-                Leave Battle
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+              <h4 className="text-xl font-bold text-white mb-2">Battle Concluded</h4>
+              <button onClick={() => setInBattle(false)} className="btn-primary w-full max-w-sm py-3 flex items-center justify-center gap-2">
+                <Flag className="w-5 h-5" /> Return to Town
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 w-full p-2">
+            <div className="grid grid-cols-2 gap-4 w-full">
               <button
                 onClick={handleAttack}
                 disabled={!playerTurn}
-                className="retro-button text-left flex items-center gap-2 hover:pl-4 transition-all"
+                className="btn-secondary h-16 flex items-center justify-center gap-3 text-lg hover:border-slate-500 hover:bg-slate-700 transition-all"
               >
-                ► Attack
+                <Sword className="w-5 h-5 text-slate-400" /> Attack
               </button>
               <button
                 onClick={handleMagic}
                 disabled={!playerTurn}
-                className="retro-button text-left flex items-center gap-2 hover:pl-4 transition-all"
+                className="btn-secondary h-16 flex items-center justify-center gap-3 text-lg hover:border-cyan-500/50 hover:bg-slate-700 transition-all"
               >
-                ► Magic (5 MP)
+                <Wand2 className="w-5 h-5 text-cyan-400" /> Magic <span className="text-xs text-cyan-500 ml-1">(5 MP)</span>
               </button>
               <button
                 onClick={handleItem}
                 disabled={!playerTurn}
-                className="retro-button text-left flex items-center gap-2 hover:pl-4 transition-all"
+                className="btn-secondary h-16 flex items-center justify-center gap-3 text-lg hover:border-emerald-500/50 hover:bg-slate-700 transition-all"
               >
-                ► Potion ({gameState.inventory.potions})
+                <FlaskConical className="w-5 h-5 text-emerald-400" /> Potion <span className="text-xs text-emerald-500 ml-1">({gameState.inventory.potions})</span>
               </button>
               <button
                 onClick={handleFlee}
                 disabled={!playerTurn}
-                className="retro-button text-left flex items-center gap-2 hover:pl-4 transition-all"
+                className="btn-secondary h-16 flex items-center justify-center gap-3 text-lg hover:border-rose-500/50 hover:bg-slate-700 transition-all"
               >
-                ► Flee
+                <Flag className="w-5 h-5 text-rose-400" /> Flee
               </button>
             </div>
           )}
+        </div>
+
+        {/* Combat Log (takes 2 cols) */}
+        <div className="panel md:col-span-2 overflow-y-auto flex flex-col justify-end gap-2 bg-slate-950 border-slate-800">
+          {combatLog.map((line, i) => (
+            <p key={i} className={`text-sm animate-fade-in ${
+              line.includes('Take') ? 'text-rose-400 font-medium' :
+              line.includes('defeated') || line.includes('Earned') ? 'text-emerald-400 font-medium' :
+              line.includes('Not enough') ? 'text-amber-400' :
+              'text-slate-300'
+            }`}>
+              {line}
+            </p>
+          ))}
         </div>
       </div>
     </div>

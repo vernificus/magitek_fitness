@@ -3,6 +3,8 @@
 import { useGame } from "@/context/GameContext";
 import { useEffect, useState } from "react";
 
+import { Flame, Dumbbell, Target, Activity } from "lucide-react";
+
 export default function DailyGoals() {
   const { gameState, gainExp, updateInventory } = useGame();
   const [claimed, setClaimed] = useState(false);
@@ -60,43 +62,59 @@ export default function DailyGoals() {
   };
 
   return (
-    <div className="retro-panel mt-8">
-      <h3 className="text-xl text-yellow-300 mb-4">Daily Quests</h3>
-      <div className="flex flex-col gap-4 text-xs">
+    <div className="panel bg-gradient-to-br from-slate-900 to-slate-800 border-indigo-500/30">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold flex items-center gap-2 text-indigo-100">
+          <Target className="w-5 h-5 text-indigo-400" /> Daily Quests
+        </h3>
+        {claimed && (
+          <span className="text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md">
+            Completed
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-6">
         <div>
-          <div className="flex justify-between mb-1">
-            <span>Consume {GOALS.calories} Calories</span>
-            <span>{Math.round(progress.calories)} / {GOALS.calories}</span>
+          <div className="flex justify-between text-sm font-medium mb-2 text-slate-300">
+            <span className="flex items-center gap-1.5"><Flame className="w-4 h-4 text-orange-400" /> Consume {GOALS.calories} Calories</span>
+            <span className="text-slate-400">{Math.round(progress.calories)} / {GOALS.calories}</span>
           </div>
-          <div className="w-full h-2 bg-gray-800 border border-white">
-            <div className="h-full bg-blue-400" style={{ width: `${Math.min(100, (progress.calories / GOALS.calories) * 100)}%` }} />
+          <div className="stat-bar-bg h-2.5">
+            <div className="h-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-1000 rounded-full" style={{ width: `${Math.min(100, (progress.calories / GOALS.calories) * 100)}%` }} />
           </div>
         </div>
 
         <div>
-          <div className="flex justify-between mb-1">
-            <span>Consume {GOALS.protein}g Protein</span>
-            <span>{Math.round(progress.protein)} / {GOALS.protein}</span>
+          <div className="flex justify-between text-sm font-medium mb-2 text-slate-300">
+            <span className="flex items-center gap-1.5"><Dumbbell className="w-4 h-4 text-rose-400" /> Consume {GOALS.protein}g Protein</span>
+            <span className="text-slate-400">{Math.round(progress.protein)} / {GOALS.protein}</span>
           </div>
-          <div className="w-full h-2 bg-gray-800 border border-white">
-            <div className="h-full bg-red-400" style={{ width: `${Math.min(100, (progress.protein / GOALS.protein) * 100)}%` }} />
+          <div className="stat-bar-bg h-2.5">
+            <div className="h-full bg-gradient-to-r from-rose-500 to-pink-400 transition-all duration-1000 rounded-full" style={{ width: `${Math.min(100, (progress.protein / GOALS.protein) * 100)}%` }} />
           </div>
         </div>
 
         <div>
-          <div className="flex justify-between mb-1">
-            <span>Train for {GOALS.activityMins} Mins</span>
-            <span>{progress.activityMins} / {GOALS.activityMins}</span>
+          <div className="flex justify-between text-sm font-medium mb-2 text-slate-300">
+            <span className="flex items-center gap-1.5"><Activity className="w-4 h-4 text-emerald-400" /> Train for {GOALS.activityMins} Mins</span>
+            <span className="text-slate-400">{progress.activityMins} / {GOALS.activityMins}</span>
           </div>
-          <div className="w-full h-2 bg-gray-800 border border-white">
-            <div className="h-full bg-green-400" style={{ width: `${Math.min(100, (progress.activityMins / GOALS.activityMins) * 100)}%` }} />
+          <div className="stat-bar-bg h-2.5">
+            <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-1000 rounded-full" style={{ width: `${Math.min(100, (progress.activityMins / GOALS.activityMins) * 100)}%` }} />
           </div>
         </div>
 
         <button
           onClick={handleClaim}
           disabled={!allGoalsMet || claimed}
-          className="retro-button mt-2"
+          className={`mt-2 py-3 px-4 rounded-xl font-bold transition-all shadow-lg ${
+            claimed
+              ? "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700 shadow-none"
+              : !allGoalsMet
+                ? "bg-slate-800/50 text-slate-500 cursor-not-allowed border border-slate-700/50"
+                : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-400 hover:to-purple-400 hover:shadow-indigo-500/25 active:scale-[0.98]"
+          }`}
         >
           {claimed ? "Reward Claimed" : "Claim Daily Reward"}
         </button>
