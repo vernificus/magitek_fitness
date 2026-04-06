@@ -4,17 +4,23 @@ import { useState } from "react";
 import { useGame } from "@/context/GameContext";
 import { Search, Loader2, UtensilsCrossed, ArrowRight, Shield, Zap, Info, Image as ImageIcon, Flame, Dumbbell } from "lucide-react";
 
+interface EdamamNutrients {
+  ENERC_KCAL?: number;
+  PROCNT?: number;
+  FAT?: number;
+  CHOCDF?: number;
+}
+
+interface EdamamFood {
+  foodId: string;
+  label: string;
+  image?: string;
+  brand?: string;
+  nutrients: EdamamNutrients;
+}
+
 interface SearchResult {
-  code: string;
-  product_name: string;
-  image_url?: string;
-  brands?: string;
-  nutriments: {
-    "energy-kcal_100g"?: number;
-    proteins_100g?: number;
-    carbohydrates_100g?: number;
-    fat_100g?: number;
-  };
+  food: EdamamFood;
 }
 
 export default function FoodPage() {
@@ -30,34 +36,55 @@ export default function FoodPage() {
 
     setIsSearching(true);
     setMessage("");
+
+    const APP_ID = process.env.NEXT_PUBLIC_EDAMAM_APP_ID;
+    const APP_KEY = process.env.NEXT_PUBLIC_EDAMAM_APP_KEY;
+
+    if (!APP_ID || !APP_KEY) {
+      setIsSearching(false);
+      setMessage("Configuration missing: Please set NEXT_PUBLIC_EDAMAM_APP_ID and NEXT_PUBLIC_EDAMAM_APP_KEY in your .env.local file.");
+      return;
+    }
+
     try {
-      // Using Open Food Facts API
       const res = await fetch(
-        `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
+        `https://api.edamam.com/api/food-database/v2/parser?app_id=${APP_ID}&app_key=${APP_KEY}&ingr=${encodeURIComponent(
           searchQuery
-        )}&search_simple=1&action=process&json=1&page_size=10`
+        )}&nutrition-type=logging`
       );
+
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}`);
+      }
+
       const data = await res.json();
-      setResults(data.products || []);
-      if (data.products?.length === 0) {
+
+      // Edamam returns hints which contain the food objects
+      const items = data.hints || [];
+
+      // Deduplicate by foodId to make the list cleaner
+      const uniqueItems = Array.from(new Map(items.map((item: any) => [item.food.foodId, item])).values()) as SearchResult[];
+
+      setResults(uniqueItems);
+      if (uniqueItems.length === 0) {
         setMessage("No items found. Try another search.");
       }
     } catch (err) {
       console.error(err);
-      setMessage("Failed to search. The tavern keeper is asleep.");
+      setMessage("Failed to search. The tavern keeper is having trouble connecting to Edamam.");
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleConsume = (product: SearchResult) => {
-    const calories = product.nutriments?.["energy-kcal_100g"] || 0;
-    const protein = product.nutriments?.proteins_100g || 0;
-    const carbs = product.nutriments?.carbohydrates_100g || 0;
-    const fat = product.nutriments?.fat_100g || 0;
+  const handleConsume = (product: EdamamFood) => {
+    const calories = product.nutrients.ENERC_KCAL || 0;
+    const protein = product.nutrients.PROCNT || 0;
+    const carbs = product.nutrients.CHOCDF || 0;
+    const fat = product.nutrients.FAT || 0;
 
     addFoodLog({
-      name: product.product_name || "Unknown Item",
+      name: product.label || "Unknown Item",
       calories,
       protein,
       carbs,
@@ -70,7 +97,7 @@ export default function FoodPage() {
     if (carbs >= 30) statMsg.push("MAG/MP up!");
     if (fat >= 15) statMsg.push("DEF up!");
 
-    setMessage(`Consumed ${product.product_name || "item"}! ${statMsg.join(" ")}`);
+    setMessage(`Consumed ${product.label || "item"}! ${statMsg.join(" ")}`);
     setResults([]);
     setSearchQuery("");
   };
@@ -86,7 +113,7 @@ export default function FoodPage() {
             <h2 className="text-2xl font-bold text-white tracking-tight">The Tavern</h2>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-400 bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
-            Powered by <span className="text-slate-300">Open Food Facts API</span>
+            Powered by <span className="text-slate-300">Edamam Food API</span>
           </div>
         </div>
 
@@ -129,41 +156,41 @@ export default function FoodPage() {
         </form>
 
         <div className="flex flex-col gap-4">
-          {results.map((product) => (
-            <div key={product.code} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-xl hover:border-slate-700 transition-colors group">
+          {results.map(({ food }) => (
+            <div key={food.foodId} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 border border-slate-800 p-4 rounded-xl hover:border-slate-700 transition-colors group">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-700 shrink-0">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.product_name} className="w-full h-full object-cover" />
+                  {food.image ? (
+                    <img src={food.image} alt={food.label} className="w-full h-full object-cover" />
                   ) : (
                     <ImageIcon className="w-6 h-6 text-slate-600" />
                   )}
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">
-                    {product.product_name || "Unknown Item"}
+                    {food.label || "Unknown Item"}
                   </h3>
-                  {product.brands && <p className="text-xs text-slate-500 mb-2">{product.brands}</p>}
+                  {food.brand && <p className="text-xs text-slate-500 mb-2">{food.brand}</p>}
 
                   <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                     <span className="font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded flex items-center gap-1">
-                      <Flame className="w-3 h-3" /> {Math.round(product.nutriments?.["energy-kcal_100g"] || 0)} kcal
+                      <Flame className="w-3 h-3" /> {Math.round(food.nutrients?.ENERC_KCAL || 0)} kcal
                     </span>
                     <span className="text-rose-400 flex items-center gap-1">
-                      <Dumbbell className="w-3 h-3" /> Pro: {Math.round(product.nutriments?.proteins_100g || 0)}g
+                      <Dumbbell className="w-3 h-3" /> Pro: {Math.round(food.nutrients?.PROCNT || 0)}g
                     </span>
                     <span className="text-cyan-400 flex items-center gap-1">
-                      <Zap className="w-3 h-3" /> Carb: {Math.round(product.nutriments?.carbohydrates_100g || 0)}g
+                      <Zap className="w-3 h-3" /> Carb: {Math.round(food.nutrients?.CHOCDF || 0)}g
                     </span>
                     <span className="text-slate-400 flex items-center gap-1">
-                      <Shield className="w-3 h-3" /> Fat: {Math.round(product.nutriments?.fat_100g || 0)}g
+                      <Shield className="w-3 h-3" /> Fat: {Math.round(food.nutrients?.FAT || 0)}g
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-600 mt-2 uppercase tracking-wider font-semibold">Values per 100g serving</div>
+                  <div className="text-[10px] text-slate-600 mt-2 uppercase tracking-wider font-semibold">Values per serving</div>
                 </div>
               </div>
               <button
-                onClick={() => handleConsume(product)}
+                onClick={() => handleConsume(food)}
                 className="w-full sm:w-auto btn-secondary border-indigo-500/30 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 Consume <ArrowRight className="w-4 h-4" />
