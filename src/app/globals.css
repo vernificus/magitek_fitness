@@ -3,9 +3,9 @@
 @theme {
   --font-sans: "Press Start 2P", system-ui, sans-serif;
 
-  --color-brand-blue: #0000AA;
-  --color-brand-blue-dark: #000055;
-  --color-brand-border: #FFFFFF;
+  --color-brand-bg: #2d3748;
+  --color-brand-bg-dark: #1a202c;
+  --color-brand-border: #e2e8f0;
 
   --animate-fade-in: fadeIn 0.5s ease-in-out;
   @keyframes fadeIn {
@@ -28,12 +28,12 @@
 
 @layer utilities {
   .retro-panel {
-    background: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-brand-blue-dark) 100%);
+    background: linear-gradient(135deg, var(--color-brand-bg) 0%, var(--color-brand-bg-dark) 100%);
     border: 4px solid var(--color-brand-border);
     border-radius: 8px;
-    box-shadow: inset -2px -2px 0px rgba(0, 0, 0, 0.5), inset 2px 2px 0px rgba(255, 255, 255, 0.5);
+    box-shadow: inset -4px -4px 0px rgba(0, 0, 0, 0.5), inset 4px 4px 0px rgba(255, 255, 255, 0.2);
     padding: 1rem;
-    color: white;
+    color: #f7fafc;
   }
 
   .retro-button {

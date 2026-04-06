@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav className="retro-panel rounded-none border-t-0 border-x-0 sticky top-0 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="flex items-center gap-4">
         <h1 className="text-xl text-yellow-300 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
-          Fit Fantasy
+          Fit Quest
         </h1>
         <div className="text-xs flex gap-2">
           <span>LVL {gameState.stats.level}</span>
