@@ -1,5 +1,16 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Setup & Configuration
+
+To use the food search feature, you must configure the Edamam Food Database API:
+1. Go to [Edamam Developer Portal](https://developer.edamam.com/edamam-docs-recipe-api) and sign up for a free account.
+2. Generate an App ID and App Key for the **Food Database API**.
+3. Create a `.env.local` file in the root of the project by copying `.env.example`:
+   ```bash
+   cp .env.example .env.local
+   ```
+4. Replace the placeholder values in `.env.local` with your actual Edamam credentials.
+
 ## Getting Started
 
 First, run the development server:
