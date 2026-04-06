@@ -11,8 +11,8 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "Fit Fantasy VI",
-  description: "A 16-bit RPG fitness and habit tracker",
+  title: "Fit Quest",
+  description: "A retro RPG fitness and habit tracker",
 };
 
 export default function RootLayout({
