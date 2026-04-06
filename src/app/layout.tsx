@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Press_Start_2P } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { GameProvider } from "@/context/GameContext";
 import Navbar from "@/components/Navbar";
 
-const pressStart2P = Press_Start_2P({
-  weight: "400",
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-press-start",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
   title: "Fit Quest",
-  description: "A retro RPG fitness and habit tracker",
+  description: "A modern RPG fitness and habit tracker",
 };
 
 export default function RootLayout({
@@ -21,13 +20,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${pressStart2P.variable} antialiased min-h-screen flex flex-col`}
+        className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col bg-slate-950 text-slate-50`}
       >
         <GameProvider>
           <Navbar />
-          <main className="flex-1 container mx-auto p-4 md:p-8">
+          <main className="flex-1 container mx-auto p-4 md:p-8 max-w-5xl">
             {children}
           </main>
         </GameProvider>

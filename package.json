@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@fontsource/press-start-2p": "^5.2.7",
     "clsx": "^2.1.1",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
